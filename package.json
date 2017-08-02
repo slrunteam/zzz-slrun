@@ -1,0 +1,11 @@
+{
+  "name": "slrun",
+  "version": "0.1.0",
+  "private": true,
+  "repository": "https://github.com/slrunteam/slrun",
+  "author": "SL.RUN <team@sl.run>",
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {}
+}
