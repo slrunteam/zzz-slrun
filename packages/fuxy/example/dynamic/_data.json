@@ -1,0 +1,9 @@
+{
+  "supplies": {
+    "title": "Cleaning Supplies",
+    "supplies": ["mop", "broom", "duster"]
+  },
+  "hello": {
+    "name": "Bob"
+  }
+}
