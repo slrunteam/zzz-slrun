@@ -1,0 +1,30 @@
+{
+  "name": "mono-scripts",
+  "version": "0.1.8",
+  "main": "lib/index.js",
+  "bin": {
+    "mono": "lib/cli.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "clearMocks": true
+  },
+  "standard": {
+    "env": {
+      "jest": true
+    }
+  },
+  "scripts": {
+    "lint": "standard --fix",
+    "test": "npm run lint && jest --testPathPattern=__tests__",
+    "test:strict": "standard && jest --testPathPattern=__tests__"
+  },
+  "repository": "https://github.com/slrunteam/slrun/tree/master/packages/mono-scripts",
+  "author": "SL.RUN <team@sl.run>",
+  "license": "MIT",
+  "dependencies": {
+    "cross-spawn": "^5.1.0",
+    "detective": "^4.5.0",
+    "fs-extra": "^4.0.1"
+  }
+}

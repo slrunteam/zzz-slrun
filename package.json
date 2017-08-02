@@ -5,7 +5,32 @@
   "repository": "https://github.com/slrunteam/slrun",
   "author": "SL.RUN <team@sl.run>",
   "license": "MIT",
-  "scripts": {},
-  "dependencies": {},
-  "devDependencies": {}
+  "config": {
+    "mono": {
+      "packageDir": "packages",
+      "bins": {
+        "*": [
+          "jest",
+          "standard"
+        ]
+      }
+    }
+  },
+  "scripts": {
+    "boot": "node packages/mono-scripts/lib/cli boot",
+    "build": "node packages/mono-scripts/lib/cli build",
+    "postinstall": "npm run boot && npm run build",
+    "lint": "node packages/mono-scripts/lib/cli run npm run lint",
+    "test": "node packages/mono-scripts/lib/cli run npm test",
+    "test:strict": "node packages/mono-scripts/lib/cli run npm run test:strict"
+  },
+  "dependencies": {
+    "cross-spawn": "^5.1.0",
+    "detective": "^4.5.0",
+    "fs-extra": "^4.0.1"
+  },
+  "devDependencies": {
+    "jest": "^20.0.4",
+    "standard": "^10.0.2"
+  }
 }
