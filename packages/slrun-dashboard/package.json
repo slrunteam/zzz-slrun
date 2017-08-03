@@ -1,0 +1,34 @@
+{
+  "name": "slrun-dashboard",
+  "version": "0.1.8",
+  "main": "server/index.js",
+  "jest": {
+    "testEnvironment": "node",
+    "clearMocks": true
+  },
+  "standard": {
+    "env": {
+      "jest": true
+    }
+  },
+  "scripts": {
+    "lint": "standard --fix",
+    "test": "npm run lint && jest --testPathPattern=__tests__",
+    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "dev": "cross-env PORT=4000 nodemon -w server -w nuxt.config.js server/start.js",
+    "build": "nuxt build",
+    "prepack": "npm run build",
+    "start": "cross-env NODE_ENV=production PORT=4000 node server/start.js"
+  },
+  "repository": "https://github.com/slrunteam/slrun/tree/master/packages/slrun-dashboard",
+  "author": "SL.RUN <team@sl.run>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "nuxt-start": "^1.0.0-rc3",
+    "primus": "^7.1.0",
+    "substream": "^0.2.0"
+  }
+}
