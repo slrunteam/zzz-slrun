@@ -1,14 +1,13 @@
-const path = require('path')
 const express = require('express')
 
-const fuxy = require('.')
+const fuxy = require('..')
 
 module.exports = startServer()
 
 function startServer () {
   const app = express()
   app.use(fuxy({
-    baseDir: path.join(__dirname, 'example')
+    baseDir: __dirname
   }))
   app.listen(3000)
   return app

@@ -4,17 +4,24 @@
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
-    "clearMocks": true
+    "clearMocks": true,
+    "testPathIgnorePatterns": [
+      "/example/"
+    ]
   },
   "standard": {
     "env": {
       "jest": true
-    }
+    },
+    "ignore": [
+      "/example/"
+    ]
   },
   "scripts": {
     "lint": "standard --fix",
     "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__"
+    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "start": "node example/server"
   },
   "repository": "https://github.com/slrunteam/slrun/tree/master/packages/fuxy",
   "author": "SL.RUN <team@sl.run>",
