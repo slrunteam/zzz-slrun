@@ -1,6 +1,6 @@
 {
   "name": "slrun-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "dependencies": {
     "ecstatic": "^2.2.1",
-    "fuxy": "^0.1.3",
+    "fuxy": "^0.1.4",
     "http-proxy": "^1.16.2"
   }
 }

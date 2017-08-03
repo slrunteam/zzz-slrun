@@ -27,8 +27,8 @@
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "slrun-client": "^0.1.6",
-    "slrun-core": "^0.1.2",
-    "slrun-server": "^0.1.1"
+    "slrun-client": "^0.1.7",
+    "slrun-core": "^0.1.3",
+    "slrun-server": "^0.1.2"
   }
 }
