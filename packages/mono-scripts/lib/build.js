@@ -4,6 +4,8 @@ const detective = require('detective')
 
 const find = require('./find')
 
+const builtinDeps = ['path', 'fs', 'http']
+
 module.exports = async function build (config) {
   const { packageDir, ignoreSrc = {} } = config
   const packageNames = find(packageDir)
@@ -22,6 +24,14 @@ module.exports = async function build (config) {
     // find dependencies
     const deps = {}
     updateDeps(deps, packagePath, ignoreSrc[packageName], true)
+    const notFoundDeps = Object.keys(deps)
+    .filter((dep) => dep.indexOf('.'))
+    .filter((dep) => builtinDeps.indexOf(dep) === -1)
+    .filter((dep) => !rootPackageInfo.dependencies[dep] && !rootPackageInfo.devDependencies[dep] &&
+      !packageVersions[dep])
+    if (notFoundDeps.length) {
+      console.log(`Not found deps for [${packageName}]: ${notFoundDeps.join(', ')}`)
+    }
     const sortedDeps = Object.keys(deps).filter((dep) => rootPackageInfo.dependencies[dep] || packageVersions[dep])
     sortedDeps.sort()
     // modify package.json to add repository, author, license and dependencies
