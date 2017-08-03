@@ -1,0 +1,29 @@
+{
+  "name": "slrun-server",
+  "version": "0.1.1",
+  "main": "lib/index.js",
+  "jest": {
+    "testEnvironment": "node",
+    "clearMocks": true
+  },
+  "standard": {
+    "env": {
+      "jest": true
+    }
+  },
+  "scripts": {
+    "lint": "standard --fix",
+    "test": "npm run lint && jest --testPathPattern=__tests__",
+    "test:strict": "standard && jest --testPathPattern=__tests__"
+  },
+  "repository": "https://github.com/slrunteam/slrun/tree/master/packages/slrun-server",
+  "author": "SL.RUN <team@sl.run>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "http-proxy": "^1.16.2",
+    "on-finished": "^2.3.0",
+    "round-to": "^2.0.0",
+    "uuid": "^3.1.0"
+  }
+}
