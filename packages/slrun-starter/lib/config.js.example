@@ -1,0 +1,5 @@
+module.exports = {
+  SSH_USERNAME: '',
+  SSH_PASSWORD: '',
+  DASHBOARD_URL: ''
+}

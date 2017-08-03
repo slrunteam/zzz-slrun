@@ -12,6 +12,19 @@
         "*": [
           "jest",
           "standard"
+        ],
+        "slrun-dashboard": [
+          "cross-env",
+          "nodemon",
+          "nuxt/bin/nuxt"
+        ]
+      },
+      "ignoreSrc": {
+        "fuxy": [
+          "example"
+        ],
+        "slrun-core": [
+          "example"
         ]
       }
     }
@@ -19,21 +32,47 @@
   "scripts": {
     "boot": "node packages/mono-scripts/lib/cli boot",
     "build": "node packages/mono-scripts/lib/cli build",
-    "postinstall": "npm run boot && npm run build",
+    "install:proxy": "cd packages/slrun-core/example/proxy && npm install",
+    "postinstall": "npm run install:proxy && npm run boot && npm run build",
     "lint": "node packages/mono-scripts/lib/cli run npm run lint",
     "test": "node packages/mono-scripts/lib/cli run npm test",
     "test:strict": "node packages/mono-scripts/lib/cli run npm run test:strict"
   },
   "dependencies": {
+    "axios": "^0.16.2",
+    "body-parser": "^1.17.2",
     "cross-spawn": "^5.1.0",
     "detective": "^4.5.0",
+    "ecstatic": "^2.2.1",
+    "eventemitter2": "^4.1.2",
     "express": "^4.15.3",
     "fs-extra": "^4.0.1",
-    "mime-types": "^2.1.16"
+    "http-proxy": "^1.16.2",
+    "mime-types": "^2.1.16",
+    "nuxt-start": "^1.0.0-rc3",
+    "on-finished": "^2.3.0",
+    "primus": "^7.1.0",
+    "primus-msgpack": "^1.0.2",
+    "reverse-tunnel-ssh": "^1.1.0",
+    "round-to": "^2.0.0",
+    "substream": "^0.2.0",
+    "uuid": "^3.1.0",
+    "ws": "^3.1.0",
+    "yargs-parser": "^7.0.0"
   },
   "devDependencies": {
+    "chart.js": "^2.6.0",
+    "cross-env": "^5.0.2",
+    "filesize": "^3.5.10",
     "harp": "^0.24.0",
     "jest": "^20.0.4",
-    "standard": "^10.0.2"
+    "moment": "^2.18.1",
+    "nodemon": "^1.11.0",
+    "nuxt": "^1.0.0-rc3",
+    "standard": "^10.0.2",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "vue-chartjs": "^2.7.2",
+    "vuetify": "^0.14.8"
   }
 }

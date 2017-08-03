@@ -1,0 +1,34 @@
+{
+  "name": "slrun-starter",
+  "version": "0.1.0",
+  "private": true,
+  "jest": {
+    "testEnvironment": "node",
+    "clearMocks": true
+  },
+  "standard": {
+    "env": {
+      "jest": true
+    }
+  },
+  "scripts": {
+    "lint": "standard --fix",
+    "test": "npm run lint && jest --testPathPattern=__tests__",
+    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "proxy": "cd ../slrun-core/example/proxy && npm start",
+    "dashboard": "cd ../slrun-dashboard && npm run dev",
+    "server": "node lib/server",
+    "client": "node lib/client --name test -p 3030 -s /static:../slrun-core/example/static -f /api:../fuxy/example"
+  },
+  "repository": "https://github.com/slrunteam/slrun/tree/master/packages/slrun-starter",
+  "author": "SL.RUN <team@sl.run>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "slrun-client": "^0.1.6",
+    "slrun-core": "^0.1.2",
+    "slrun-server": "^0.1.1"
+  }
+}
