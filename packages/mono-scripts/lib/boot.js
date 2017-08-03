@@ -23,12 +23,15 @@ module.exports = async function boot (config) {
       fs.symlinkSync(packagePath, path.join(packageContainerPath, packageName), 'dir')
     }
     const packageBinPath = path.join(packagePath, 'node_modules', '.bin')
+    await fs.remove(packageBinPath)
     await fs.ensureDir(packageBinPath)
     const bins = commonBins.concat((binsByPackage[packageName] || []))
     for (const bin of bins) {
-      const binPath = path.join(packageBinPath, bin)
+      const binParts = bin.split('/')
+      const binPath = path.join(packageBinPath, binParts[binParts.length - 1])
       await fs.remove(binPath)
-      const rootBinPath = path.resolve('node_modules', '.bin', bin)
+      const rootBinPath = binParts.length === 1 ? path.resolve('node_modules', '.bin', bin)
+        : path.resolve('node_modules', bin)
       if (fs.existsSync(rootBinPath)) {
         fs.symlinkSync(rootBinPath, binPath, 'file')
       }
