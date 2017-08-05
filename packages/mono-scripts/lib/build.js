@@ -1,10 +1,10 @@
 const path = require('path')
 const fs = require('fs-extra')
+const isBuiltinModule = require('is-builtin-module')
 const detective = require('detective')
+const chalk = require('chalk')
 
 const find = require('./find')
-
-const builtinDeps = ['path', 'fs', 'http']
 
 module.exports = async function build (config) {
   const { packageDir, ignoreSrc = {} } = config
@@ -12,6 +12,7 @@ module.exports = async function build (config) {
   const licensePath = path.resolve('LICENSE')
   const rootPackageInfo = await fs.readJson(path.resolve('package.json'))
   const packageVersions = {}
+  const allDeps = {}
   for (const packageName of packageNames) {
     const packagePath = path.resolve(packageDir, packageName)
     const packageInfo = await fs.readJson(path.join(packagePath, 'package.json'))
@@ -24,13 +25,12 @@ module.exports = async function build (config) {
     // find dependencies
     const deps = {}
     updateDeps(deps, packagePath, ignoreSrc[packageName], true)
+    Object.keys(deps).forEach((dep) => { allDeps[dep] = true })
     const notFoundDeps = Object.keys(deps)
-    .filter((dep) => dep.indexOf('.'))
-    .filter((dep) => builtinDeps.indexOf(dep) === -1)
     .filter((dep) => !rootPackageInfo.dependencies[dep] && !rootPackageInfo.devDependencies[dep] &&
       !packageVersions[dep])
     if (notFoundDeps.length) {
-      console.log(`Not found deps for [${packageName}]: ${notFoundDeps.join(', ')}`)
+      console.warn(chalk.red(`Not found deps for [${packageName}]: ${notFoundDeps.join(', ')}`))
     }
     const sortedDeps = Object.keys(deps).filter((dep) => rootPackageInfo.dependencies[dep] || packageVersions[dep])
     sortedDeps.sort()
@@ -47,6 +47,11 @@ module.exports = async function build (config) {
     })
     await fs.writeJson(path.join(packagePath, 'package.json'), packageInfo, { spaces: 2 })
   }
+  const unusedDeps = Object.keys(rootPackageInfo.dependencies)
+  .filter((dep) => !allDeps[dep])
+  if (unusedDeps.length) {
+    console.warn(chalk.red(`Unused deps: ${unusedDeps.join(', ')}`))
+  }
 }
 
 function updateDeps (deps, srcPath, namesToIgnore, isRoot) {
@@ -61,6 +66,8 @@ function updateDeps (deps, srcPath, namesToIgnore, isRoot) {
     } else if (!isRoot && path.extname(childPath) === '.js') {
       detective(fs.readFileSync(childPath))
       .map((dep) => dep.split('/')[0])
+      .filter((dep) => dep.indexOf('.'))
+      .filter((dep) => !isBuiltinModule(dep))
       .forEach((dep) => { deps[dep] = true })
     }
   })
