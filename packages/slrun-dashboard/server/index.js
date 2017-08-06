@@ -1,3 +1,5 @@
+require('ws')
+require('primus-msgpack')
 const http = require('http')
 const express = require('express')
 const Primus = require('primus')
