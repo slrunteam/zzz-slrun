@@ -27,8 +27,8 @@
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "nuxt-start": "^1.0.0-rc3",
     "primus": "^7.1.0",
+    "slrun-nuxt-start": "^1.0.0-rc3",
     "substream": "^0.2.0"
   }
 }
