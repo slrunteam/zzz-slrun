@@ -27,8 +27,8 @@ module.exports = async function build (config) {
     updateDeps(deps, packagePath, ignoreSrc[packageName], true)
     Object.keys(deps).forEach((dep) => { allDeps[dep] = true })
     const notFoundDeps = Object.keys(deps)
-    .filter((dep) => !rootPackageInfo.dependencies[dep] && !rootPackageInfo.devDependencies[dep] &&
-      !packageVersions[dep])
+      .filter((dep) => !rootPackageInfo.dependencies[dep] && !rootPackageInfo.devDependencies[dep] &&
+        !packageVersions[dep])
     if (notFoundDeps.length) {
       console.warn(chalk.red(`Not found deps for [${packageName}]: ${notFoundDeps.join(', ')}`))
     }
@@ -47,8 +47,7 @@ module.exports = async function build (config) {
     })
     await fs.writeJson(path.join(packagePath, 'package.json'), packageInfo, { spaces: 2 })
   }
-  const unusedDeps = Object.keys(rootPackageInfo.dependencies)
-  .filter((dep) => !allDeps[dep])
+  const unusedDeps = Object.keys(rootPackageInfo.dependencies).filter((dep) => !allDeps[dep])
   if (unusedDeps.length) {
     console.warn(chalk.red(`Unused deps: ${unusedDeps.join(', ')}`))
   }
@@ -56,19 +55,19 @@ module.exports = async function build (config) {
 
 function updateDeps (deps, srcPath, namesToIgnore, isRoot) {
   fs.readdirSync(srcPath)
-  .filter((childName) => !namesToIgnore || namesToIgnore.indexOf(childName) === -1)
-  .filter((childName) => childName !== 'node_modules')
-  .filter((childName) => childName.indexOf('.'))
-  .forEach((childName) => {
-    const childPath = path.join(srcPath, childName)
-    if (fs.statSync(childPath).isDirectory()) {
-      updateDeps(deps, childPath, namesToIgnore)
-    } else if (!isRoot && path.extname(childPath) === '.js') {
-      detective(fs.readFileSync(childPath))
-      .map((dep) => dep.split('/')[0])
-      .filter((dep) => dep.indexOf('.'))
-      .filter((dep) => !isBuiltinModule(dep))
-      .forEach((dep) => { deps[dep] = true })
-    }
-  })
+    .filter((childName) => !namesToIgnore || namesToIgnore.indexOf(childName) === -1)
+    .filter((childName) => childName !== 'node_modules')
+    .filter((childName) => childName.indexOf('.'))
+    .forEach((childName) => {
+      const childPath = path.join(srcPath, childName)
+      if (fs.statSync(childPath).isDirectory()) {
+        updateDeps(deps, childPath, namesToIgnore)
+      } else if (!isRoot && path.extname(childPath) === '.js') {
+        detective(fs.readFileSync(childPath))
+          .map((dep) => dep.split('/')[0])
+          .filter((dep) => dep.indexOf('.'))
+          .filter((dep) => !isBuiltinModule(dep))
+          .forEach((dep) => { deps[dep] = true })
+      }
+    })
 }
