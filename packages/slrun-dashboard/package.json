@@ -26,7 +26,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
-    "express": "^4.15.3",
+    "express": "^4.15.4",
     "primus": "^7.1.0",
     "primus-msgpack": "^1.0.2",
     "slrun-nuxt-start": "^1.0.0-rc3",
