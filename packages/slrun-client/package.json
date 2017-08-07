@@ -1,6 +1,6 @@
 {
   "name": "slrun-client",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",

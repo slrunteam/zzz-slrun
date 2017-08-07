@@ -1,6 +1,6 @@
 {
   "name": "mono-scripts",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "main": "lib/index.js",
   "bin": {
     "mono": "lib/cli.js"
