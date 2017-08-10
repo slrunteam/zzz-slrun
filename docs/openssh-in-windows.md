@@ -1,37 +1,15 @@
 # OpenSSH in Windows
 
-## Install
+The below instruction is the easiest way to have a SSH server running in Windows. More information can be found at https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH.
 
-1. Download the latest build of [OpenSSH for Windows](https://github.com/PowerShell/Win32-OpenSSH/releases/latest/)
-2. Extract contents of the latest build to `C:\Program Files\OpenSSH`
-3. Start Windows PowerShell as Administrator
-4. Navigate to the OpenSSH directory `C:\Program Files\OpenSSH`
-5. Install sshd and ssh-agent services
+1. Download the latest release of [OpenSSH for Windows](https://github.com/PowerShell/Win32-OpenSSH/releases) (Win32 or Win64)
+2. Extract the content to your file system, such as in `C:\Program Files\OpenSSH`
+3. Run Windows Command Line (cmd) as Administrator and navigate to the above installation folder
+4. Generate SSH host keys
 ```
-powershell -ExecutionPolicy Bypass -File install-sshd.ps1
+.\ssh-keygen.exe -A
 ```
-6. Open the firewall on TCP port 22 to allow inbound SSH connections
-* If you're on a server machine
+5. Start OpenSSH server
 ```
-New-NetFirewallRule -Protocol TCP -LocalPort 22 -Direction Inbound -Action Allow -DisplayName SSH
+.\sshd
 ```
-* If you're on a client desktop machine (like Windows 10)
-```
-netsh advfirewall firewall add rule name=SSHPort dir=in action=allow protocol=TCP localport=22
-```
-7. Start ssh server
-```
-sshd
-```
-
-## Uninstall
-
-1. Start Windows Powershell as Administrator
-2. Navigate to the OpenSSH directory `C:\Program Files\OpenSSH`
-3. Run the uninstall script
-```
-powershell -ExecutionPolicy Bypass -File uninstall-sshd.ps1
-```
-
-## More infomation
-* https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH
