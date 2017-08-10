@@ -57,9 +57,9 @@ function createUrlEntry (value, mode) {
 function createPathEntry (value, mode) {
   const parts = value.split(':')
   if (parts.length === 1) {
-    return { mode, path: '/', base: normalizePath(parts[0]) }
+    return { mode, path: '/', base: normalizeFilePath(parts[0]) }
   }
-  return { mode, path: normalizeEntryPath(parts[0]), base: normalizePath(parts[1]) }
+  return { mode, path: normalizeEntryPath(parts[0]), base: normalizeFilePath(parts[1]) }
 }
 
 function isArray (value) {
@@ -70,14 +70,14 @@ function isNumber (value) {
   return typeof value === 'number'
 }
 
-function normalizeEntryPath (path) {
-  return path.indexOf('/') ? `/${path}` : path
+function normalizeEntryPath (entryPath) {
+  return entryPath.indexOf('/') ? `/${entryPath}` : entryPath
 }
 
 function normalizeUrl (url) {
   return url.indexOf('http') ? `http://${url}` : url
 }
 
-function normalizePath (pathSegment) {
-  return path.resolve(pathSegment)
+function normalizeFilePath (filePath) {
+  return path.resolve(filePath)
 }

@@ -1,4 +1,4 @@
-const pathLib = require('path')
+const path = require('path')
 
 module.exports = {
   head: {
@@ -10,7 +10,7 @@ module.exports = {
     vendor: ['axios', 'chart.js', 'filesize', 'moment', 'vue-chartjs', 'vuetify', '~/plugins/apiClient'],
     extractCSS: true,
     extend (config) {
-      const packageContainerPath = pathLib.resolve('../../node_modules')
+      const packageContainerPath = path.join(__dirname, '../../node_modules')
       config.resolve.modules.push(packageContainerPath)
       config.resolveLoader.modules.push(packageContainerPath)
     }
