@@ -17,31 +17,30 @@ module.exports = function parseOptions (processArgv) {
 }
 
 function parseEntries (argv) {
-  const allEntries = Object.keys(argv)
-  .map((key) => {
-    const values = isArray(argv[key]) ? argv[key] : [argv[key]]
-    if (key === 'proxy') {
-      return values.map((value) => createUrlEntry(value, 'PROXY'))
-    }
-    if (key === 'static') {
-      return values.map((value) => createPathEntry(value, 'STATIC'))
-    }
-    if (key === 'function') {
-      return values.map((value) => createPathEntry(value, 'FUNCTION'))
-    }
-    return null
-  })
-  .reduce((entries, subEntries) => {
-    if (subEntries) {
-      subEntries.forEach((subEntry) => {
-        if (subEntry) {
-          entries.push(subEntry)
-        }
-      })
-    }
-    return entries
-  }, [])
-  return allEntries
+  return Object.keys(argv)
+    .map((key) => {
+      const values = isArray(argv[key]) ? argv[key] : [argv[key]]
+      if (key === 'proxy') {
+        return values.map((value) => createUrlEntry(value, 'PROXY'))
+      }
+      if (key === 'static') {
+        return values.map((value) => createPathEntry(value, 'STATIC'))
+      }
+      if (key === 'function') {
+        return values.map((value) => createPathEntry(value, 'FUNCTION'))
+      }
+      return null
+    })
+    .reduce((entries, subEntries) => {
+      if (subEntries) {
+        subEntries.forEach((subEntry) => {
+          if (subEntry) {
+            entries.push(subEntry)
+          }
+        })
+      }
+      return entries
+    }, [])
 }
 
 function createUrlEntry (value, mode) {
@@ -58,9 +57,9 @@ function createUrlEntry (value, mode) {
 function createPathEntry (value, mode) {
   const parts = value.split(':')
   if (parts.length === 1) {
-    return { mode, path: '/', base: normalizePath(parts[0]) }
+    return { mode, path: '/', base: normalizeFilePath(parts[0]) }
   }
-  return { mode, path: normalizeEntryPath(parts[0]), base: normalizePath(parts[1]) }
+  return { mode, path: normalizeEntryPath(parts[0]), base: normalizeFilePath(parts[1]) }
 }
 
 function isArray (value) {
@@ -71,14 +70,14 @@ function isNumber (value) {
   return typeof value === 'number'
 }
 
-function normalizeEntryPath (path) {
-  return path.indexOf('/') ? `/${path}` : path
+function normalizeEntryPath (entryPath) {
+  return entryPath.indexOf('/') ? `/${entryPath}` : entryPath
 }
 
 function normalizeUrl (url) {
   return url.indexOf('http') ? `http://${url}` : url
 }
 
-function normalizePath (pathSegment) {
-  return path.resolve(pathSegment)
+function normalizeFilePath (filePath) {
+  return path.resolve(filePath)
 }

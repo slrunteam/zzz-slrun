@@ -1,3 +1,5 @@
+require('ws')
+require('primus-msgpack')
 const http = require('http')
 const express = require('express')
 const Primus = require('primus')
@@ -9,13 +11,13 @@ const nuxtConfig = require('../nuxt.config.js')
 
 module.exports = function createServer (options = {}) {
   const isProd = process.env.NODE_ENV === 'production'
-  const { rootDir } = options
+  const { rootDir, initApp } = options
   const app = express()
   const config = Object.assign({}, nuxtConfig, {
     dev: !isProd,
     rootDir
   })
-  const { Nuxt, Builder } = isProd ? require('nuxt-start') : require('nuxt')
+  const { Nuxt, Builder } = isProd ? require('slrun-nuxt-start') : require('nuxt')
   const nuxt = new Nuxt(config)
   const httpServer = http.createServer(app)
   const primus = new Primus(httpServer, {
@@ -32,6 +34,9 @@ module.exports = function createServer (options = {}) {
     console.log('stopped connection')
     delete serviceBySparkId[spark.id]
   })
+  if (initApp) {
+    initApp(app, httpServer)
+  }
   app.get('/api/services', (req, res) => {
     const services = Object.keys(serviceBySparkId).map((sparkId) => serviceBySparkId[sparkId])
     services.sort((s1, s2) => (s1.id < s2.id) ? -1 : (s1.id > s2.id) ? 1 : 0)
@@ -52,18 +57,6 @@ module.exports = function createServer (options = {}) {
     const replayOptions = Object.assign({ maxRedirects: 0, validateStatus: false }, req.body)
     await axios.request(replayOptions)
     res.send('OK')
-  })
-  app.post('/api/stop', (req, res) => {
-    res.send('SL.RUN Dashboard Stopped')
-    const exit = () => {
-      console.log('stopped server')
-      process.exit()
-    }
-    httpServer.close(exit)
-    setTimeout(exit, 1000)
-  })
-  app.get('/api', (req, res) => {
-    res.send('SL.RUN Dashboard API')
   })
   app.use(nuxt.render)
   if (config.dev) {

@@ -16,7 +16,7 @@
         "slrun-dashboard": [
           "cross-env",
           "nodemon",
-          "nuxt/bin/nuxt"
+          "nuxt"
         ]
       },
       "ignoreSrc": {
@@ -41,20 +41,22 @@
   "dependencies": {
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
+    "chalk": "^2.1.0",
     "cross-spawn": "^5.1.0",
     "detective": "^4.5.0",
     "ecstatic": "^2.2.1",
     "eventemitter2": "^4.1.2",
-    "express": "^4.15.3",
+    "express": "^4.15.4",
     "fs-extra": "^4.0.1",
     "http-proxy": "^1.16.2",
+    "is-builtin-module": "^1.0.0",
     "mime-types": "^2.1.16",
-    "nuxt-start": "^1.0.0-rc3",
     "on-finished": "^2.3.0",
     "primus": "^7.1.0",
     "primus-msgpack": "^1.0.2",
     "reverse-tunnel-ssh": "^1.1.0",
     "round-to": "^2.0.0",
+    "slrun-nuxt-start": "^1.0.0-rc3",
     "substream": "^0.2.0",
     "uuid": "^3.1.0",
     "ws": "^3.1.0",
@@ -62,17 +64,17 @@
   },
   "devDependencies": {
     "chart.js": "^2.6.0",
-    "cross-env": "^5.0.2",
+    "cross-env": "^5.0.5",
     "filesize": "^3.5.10",
     "harp": "^0.24.0",
     "jest": "^20.0.4",
     "moment": "^2.18.1",
     "nodemon": "^1.11.0",
-    "nuxt": "^1.0.0-rc3",
-    "standard": "^10.0.2",
+    "nuxt": "^1.0.0-rc4",
+    "standard": "^10.0.3",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "vue-chartjs": "^2.7.2",
+    "vue-chartjs": "^2.8.1",
     "vuetify": "^0.14.8"
   }
 }

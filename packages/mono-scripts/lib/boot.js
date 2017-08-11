@@ -22,18 +22,25 @@ module.exports = async function boot (config) {
       }
       fs.symlinkSync(packagePath, path.join(packageContainerPath, packageName), 'dir')
     }
-    const packageBinPath = path.join(packagePath, 'node_modules', '.bin')
-    await fs.remove(packageBinPath)
+    const packageDepPath = path.join(packagePath, 'node_modules')
+    const packageBinPath = path.join(packageDepPath, '.bin')
+    await fs.remove(packageDepPath)
     await fs.ensureDir(packageBinPath)
     const bins = commonBins.concat((binsByPackage[packageName] || []))
     for (const bin of bins) {
-      const binParts = bin.split('/')
-      const binPath = path.join(packageBinPath, binParts[binParts.length - 1])
-      await fs.remove(binPath)
-      const rootBinPath = binParts.length === 1 ? path.resolve('node_modules', '.bin', bin)
-        : path.resolve('node_modules', bin)
+      const rootBinModulePath = path.resolve('node_modules', bin)
+      if (fs.existsSync(rootBinModulePath)) {
+        fs.symlinkSync(rootBinModulePath, path.join(packageDepPath, bin), 'dir')
+      }
+      const rootBinPath = path.resolve('node_modules', '.bin', bin)
+      const binPath = path.join(packageBinPath, bin)
       if (fs.existsSync(rootBinPath)) {
         fs.symlinkSync(rootBinPath, binPath, 'file')
+      }
+      const rootBinPathCmd = `${rootBinPath}.cmd`
+      const binPathCmd = `${binPath}.cmd`
+      if (fs.existsSync(rootBinPathCmd)) {
+        fs.symlinkSync(rootBinPathCmd, binPathCmd, 'file')
       }
     }
     console.log(`Linked binaries [${bins.join(', ')}] to ${packageDir}/${packageName}/node_modules`)
