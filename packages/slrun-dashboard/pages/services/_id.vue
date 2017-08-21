@@ -180,9 +180,9 @@ export default {
           }
           const time = moment(request.createdAt).format('HH:mm:ss')
           if (time in re) {
-            if (request.resStatusCode != 200) {
+            if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
               re[time]['ErrorRequests']++
-            } else {
+            } else if {
               re[time]['Requests']++
             }
             re[time]['ResponseTime'] += request.resTime
@@ -190,7 +190,7 @@ export default {
             re[time]['DataTransferred'] += request.resSize
           } else {
             re[time] = {}
-            if (request.resStatusCode != 200) {
+            if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
               re[time]['ErrorRequests'] = 1
               re[time]['Requests'] = 0
             } else {
