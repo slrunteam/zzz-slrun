@@ -17,7 +17,7 @@ module.exports = function createServer (options = {}) {
     dev: !isProd,
     rootDir
   })
-  const { Nuxt, Builder } = isProd ? require('slrun-nuxt-start') : require('nuxt')
+  const { Nuxt, Builder } = isProd ? require('nuxt-start') : require('nuxt')
   const nuxt = new Nuxt(config)
   const httpServer = http.createServer(app)
   const primus = new Primus(httpServer, {
