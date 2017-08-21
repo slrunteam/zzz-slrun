@@ -182,7 +182,7 @@ export default {
           if (time in re) {
             if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
               re[time]['ErrorRequests']++
-            } else if {
+            } else {
               re[time]['Requests']++
             }
             re[time]['ResponseTime'] += request.resTime
