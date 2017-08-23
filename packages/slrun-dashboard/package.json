@@ -1,6 +1,6 @@
 {
   "name": "slrun-dashboard",
-  "version": "0.1.14",
+  "version": "0.1.16",
   "main": "server/index.js",
   "jest": {
     "testEnvironment": "node",
@@ -27,9 +27,9 @@
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
+    "nuxt-start": "^1.0.0-rc6",
     "primus": "^7.1.0",
     "primus-msgpack": "^1.0.2",
-    "slrun-nuxt-start": "^1.0.0-rc4",
     "substream": "^0.2.0",
     "ws": "^3.1.0"
   }
