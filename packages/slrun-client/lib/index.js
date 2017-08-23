@@ -7,7 +7,9 @@ const { EventEmitter2 } = require('eventemitter2')
 const Primus = require('primus')
 const substream = require('substream')
 const bodyParser = require('body-parser')
+const { machineIdSync } = require('node-machine-id')
 
+const machineId = machineIdSync()
 const localhost = '127.0.0.1'
 const jsonParser = bodyParser.json()
 
@@ -81,7 +83,7 @@ module.exports = function createClient (options) {
       })
     }
     tunnel.on('forward-in', async (remotePort) => {
-      const service = (await apiClient.services.post('/', { name, sshPoint, remotePort })).data
+      const service = (await apiClient.services.post('/', { name, sshPoint, remotePort, machineId })).data
       Object.assign(client, { service, localPort })
       client.emit('create-service')
     })
