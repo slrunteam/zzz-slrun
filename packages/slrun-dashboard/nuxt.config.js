@@ -8,7 +8,8 @@ module.exports = {
   },
   build: {
     vendor: ['axios', 'chart.js', 'filesize', 'moment', 'vue-chartjs', 'vuetify', '~/plugins/apiClient'],
-    dll: true,
+    // BD: dll does not work, try again later
+    dll: false,
     extractCSS: true,
     extend (config) {
       const packageContainerPath = path.join(__dirname, '../../node_modules')

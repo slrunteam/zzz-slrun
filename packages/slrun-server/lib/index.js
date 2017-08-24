@@ -59,7 +59,7 @@ module.exports = function createServer (options) {
         resStatusCode: statusCode,
         resSize: size,
         resTime: time
-      })
+      }, { params: { clientKey: service.clientKey } })
     })
     createProxyServer({ target: service.remoteUrl }).web(req, res, next)
   }

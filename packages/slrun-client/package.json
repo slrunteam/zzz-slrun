@@ -1,6 +1,6 @@
 {
   "name": "slrun-client",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
@@ -23,7 +23,6 @@
     "body-parser": "^1.17.2",
     "eventemitter2": "^4.1.2",
     "express": "^4.15.4",
-    "node-machine-id": "^1.1.9",
     "primus": "^7.1.0",
     "primus-msgpack": "^1.0.2",
     "reverse-tunnel-ssh": "^1.1.0",

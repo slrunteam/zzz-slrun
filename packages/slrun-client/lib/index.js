@@ -7,14 +7,12 @@ const { EventEmitter2 } = require('eventemitter2')
 const Primus = require('primus')
 const substream = require('substream')
 const bodyParser = require('body-parser')
-const { machineIdSync } = require('node-machine-id')
 
-const machineId = machineIdSync()
 const localhost = '127.0.0.1'
 const jsonParser = bodyParser.json()
 
 module.exports = function createClient (options) {
-  const { name, executor, apiClient, tunnelAuth, dashboardUrl } = options
+  const { name, executor, apiClient, tunnelAuth, dashboardUrl, decorators = {} } = options
   const client = new EventEmitter2()
   const PrimusSocket = Primus.createSocket({
     transformer: 'websockets',
@@ -41,11 +39,17 @@ module.exports = function createClient (options) {
   const app = express()
   const requests = []
   app.get('/__slrun__/requests', (req, res) => {
-    // BD: TODO add authentication
+    if (!client.service || client.service.clientKey !== req.query.clientKey) {
+      res.status(403).end()
+      return
+    }
     res.json(client.requests)
   })
   app.post('/__slrun__/requests', (req, res) => {
-    // BD: TODO add authentication
+    if (!client.service || client.service.clientKey !== req.query.clientKey) {
+      res.status(403).end()
+      return
+    }
     jsonParser(req, res, () => {
       requests.push(req.body)
       res.json('OK')
@@ -83,7 +87,8 @@ module.exports = function createClient (options) {
       })
     }
     tunnel.on('forward-in', async (remotePort) => {
-      const service = (await apiClient.services.post('/', { name, sshPoint, remotePort, machineId })).data
+      const serviceOptions = { name, sshPoint, remotePort }
+      const service = (await apiClient.services.post('/', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
       Object.assign(client, { service, localPort })
       client.emit('create-service')
     })
@@ -92,8 +97,8 @@ module.exports = function createClient (options) {
   return client
   function reportService () {
     if (dashboardClient && client.service) {
-      const { service: { id, url }, localPort } = client
-      dashboardClient.substream('REPORT_SERVICE').write({ id, url, localPort })
+      const { service: { id, url, clientKey }, localPort } = client
+      dashboardClient.substream('REPORT_SERVICE').write({ id, url, localPort, clientKey })
     }
   }
 }

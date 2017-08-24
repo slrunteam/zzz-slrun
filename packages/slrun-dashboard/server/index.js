@@ -11,7 +11,7 @@ const nuxtConfig = require('../nuxt.config.js')
 
 module.exports = function createServer (options = {}) {
   const isProd = process.env.NODE_ENV === 'production'
-  const { rootDir, initApp } = options
+  const { rootDir, decorators = {} } = options
   const app = express()
   const config = Object.assign({}, nuxtConfig, {
     dev: !isProd,
@@ -34,8 +34,8 @@ module.exports = function createServer (options = {}) {
     console.log('stopped connection')
     delete serviceBySparkId[spark.id]
   })
-  if (initApp) {
-    initApp(app, httpServer)
+  if (decorators.dashboard) {
+    decorators.dashboard(app, httpServer)
   }
   app.get('/api/services', (req, res) => {
     const services = Object.keys(serviceBySparkId).map((sparkId) => serviceBySparkId[sparkId])
@@ -50,7 +50,7 @@ module.exports = function createServer (options = {}) {
       return
     }
     const service = serviceBySparkId[sparkIdForService]
-    const requests = (await axios.get(`http://127.0.0.1:${service.localPort}/__slrun__/requests`)).data
+    const requests = (await axios.get(`http://127.0.0.1:${service.localPort}/__slrun__/requests`, { params: { clientKey: service.clientKey } })).data
     res.json(Object.assign({}, service, { requests }))
   })
   app.post('/api/replay', bodyParser.json(), async (req, res) => {
