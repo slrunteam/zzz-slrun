@@ -57,6 +57,9 @@ module.exports = function createClient (options) {
   })
   app.use(executor)
   const httpServer = http.createServer(app)
+  if (decorators.client) {
+    decorators.client(app, httpServer)
+  }
   httpServer.on('upgrade', executor.upgrade)
   Object.assign(client, { app, httpServer, dashboardClient, requests })
   httpServer.listen(0, localhost, async () => {
