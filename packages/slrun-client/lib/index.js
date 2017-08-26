@@ -55,13 +55,13 @@ module.exports = function createClient (options) {
       res.json('OK')
     })
   })
-  if (decorators.client) {
-    decorators.client(app)
-  }
   app.use(executor)
   const httpServer = http.createServer(app)
   httpServer.on('upgrade', executor.upgrade)
   Object.assign(client, { app, httpServer, dashboardClient, requests })
+  if (decorators.client) {
+    decorators.client(client)
+  }
   httpServer.listen(0, localhost, async () => {
     const sshPoint = (await apiClient.sshPoints.get('/random')).data
     const localPort = httpServer.address().port

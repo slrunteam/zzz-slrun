@@ -8,6 +8,10 @@ module.exports = function createExecutor (context) {
   entries.sort((e1, e2) => (e1.path > e2.path) ? -1 : (e1.path < e2.path) ? 1 : 0)
   return Object.assign(executor, { upgrade })
   function executor (req, res, next) {
+    if (!req.path.indexOf('/__slrun__')) {
+      next()
+      return
+    }
     const entry = entries.find((entry) => startsWith(req.url, entry.path))
     if (!entry) {
       next()
