@@ -91,9 +91,14 @@ module.exports = function createClient (options) {
     }
     tunnel.on('forward-in', async (remotePort) => {
       const serviceOptions = { name, sshPoint, remotePort }
-      const service = (await apiClient.services.post('/', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
-      Object.assign(client, { service, localPort })
-      client.emit('create-service')
+      try {
+        const service = (await apiClient.services.post('/', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
+        Object.assign(client, { service, localPort })
+        client.emit('create-service')
+      } catch (error) {
+        console.log('create-service error')
+        process.exit(1)
+      }
     })
     // BD: TODO reconnect when tunnel is closed
   })
