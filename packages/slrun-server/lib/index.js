@@ -5,7 +5,7 @@ const onFinished = require('on-finished')
 const roundTo = require('round-to')
 
 module.exports = function createServer (options) {
-  const { api } = options
+  const { api, decorators = {} } = options
   return { serviceHandler, upgradeHandler }
   async function serviceHandler (req, res, next) {
     const createdAt = new Date()
@@ -40,7 +40,7 @@ module.exports = function createServer (options) {
       size += chunk.length
       prevWrite.apply(res, arguments)
     }
-    onFinished(res, () => {
+    onFinished(res, async () => {
       const diffTime = process.hrtime(startTime)
       const time = roundTo(diffTime[0] * 1e3 + diffTime[1] * 1e-6, 0)
       const { method, originalUrl: url } = req
@@ -49,6 +49,9 @@ module.exports = function createServer (options) {
       delete headers['slrun-service']
       delete headers['slrun-request']
       const { statusCode } = res
+      if (decorators.server) {
+        await decorators.server(service, res)
+      }
       axios.post(`${service.remoteUrl}/__slrun__/requests`, {
         id: requestId,
         createdAt,
