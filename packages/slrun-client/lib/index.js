@@ -92,7 +92,7 @@ module.exports = function createClient (options) {
     tunnel.on('forward-in', async (remotePort) => {
       const serviceOptions = { name, sshPoint, remotePort }
       try {
-        const service = (await apiClient.services.post('/', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
+        const service = (await apiClient.services.post('/register', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
         Object.assign(client, { service, localPort })
         client.emit('create-service')
       } catch (error) {

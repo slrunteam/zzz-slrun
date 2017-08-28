@@ -2,9 +2,9 @@ const uuid = require('uuid/v4')
 
 const serviceById = {}
 
-module.exports = { create, findById }
+module.exports = { register, findById }
 
-function create (options) {
+function register (options) {
   const { name, sshPoint, remotePort } = options
   const id = name
   const clientKey = uuid()
