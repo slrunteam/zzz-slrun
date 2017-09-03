@@ -13,8 +13,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__"
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest"
   },
   "repository": "https://github.com/slrunteam/slrun/tree/master/packages/slrun-server",
   "author": "SL.RUN <team@sl.run>",

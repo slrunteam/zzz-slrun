@@ -1,6 +1,6 @@
 {
   "name": "slrun-dashboard",
-  "version": "0.1.16",
+  "version": "0.1.18",
   "main": "server/index.js",
   "jest": {
     "testEnvironment": "node",
@@ -13,8 +13,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest",
     "dev": "cross-env PORT=4000 nodemon -w server -w nuxt.config.js server/start.js",
     "build": "nuxt build",
     "prepack": "npm run build",
@@ -27,7 +27,7 @@
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
-    "nuxt-start": "^1.0.0-rc6",
+    "nuxt-start": "^1.0.0-rc8",
     "primus": "^7.1.0",
     "primus-msgpack": "^1.0.2",
     "substream": "^0.2.0",

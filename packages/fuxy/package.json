@@ -1,12 +1,15 @@
 {
   "name": "fuxy",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
     "clearMocks": true,
     "testPathIgnorePatterns": [
       "/example/"
+    ],
+    "collectCoverageFrom": [
+      "lib/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "/example/"
@@ -30,8 +33,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__ --coverage",
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest --coverage",
     "start": "node example/server"
   },
   "repository": "https://github.com/slrunteam/slrun/tree/master/packages/fuxy",

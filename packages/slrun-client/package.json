@@ -1,6 +1,6 @@
 {
   "name": "slrun-client",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
@@ -13,8 +13,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__"
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest"
   },
   "repository": "https://github.com/slrunteam/slrun/tree/master/packages/slrun-client",
   "author": "SL.RUN <team@sl.run>",

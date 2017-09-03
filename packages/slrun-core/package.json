@@ -1,13 +1,27 @@
 {
   "name": "slrun-core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
     "clearMocks": true,
     "testPathIgnorePatterns": [
       "/example/"
-    ]
+    ],
+    "collectCoverageFrom": [
+      "lib/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/example/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+      }
+    }
   },
   "standard": {
     "env": {
@@ -19,8 +33,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest --coverage",
     "proxy": "cd example/proxy && npm start",
     "start": "node example/server"
   },
@@ -28,8 +42,8 @@
   "author": "SL.RUN <team@sl.run>",
   "license": "MIT",
   "dependencies": {
-    "ecstatic": "^2.2.1",
-    "fuxy": "^0.1.4",
+    "ecstatic": "^3.0.0",
+    "fuxy": "^0.1.6",
     "http-proxy": "^1.16.2"
   }
 }

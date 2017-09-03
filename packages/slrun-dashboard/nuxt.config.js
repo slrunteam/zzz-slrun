@@ -7,7 +7,7 @@ module.exports = {
     ]
   },
   build: {
-    vendor: ['axios', 'chart.js', 'filesize', 'moment', 'vue-chartjs', 'vuetify', '~/plugins/apiClient'],
+    vendor: ['axios', 'filesize', 'moment', 'vuetify', '~/plugins/apiClient'],
     // BD: dll does not work, try again later
     dll: false,
     extractCSS: true,
