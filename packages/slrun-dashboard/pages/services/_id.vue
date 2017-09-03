@@ -4,7 +4,7 @@
       <h3>{{ serviceId }}</h3>
       <strong>Url: <a :href="serviceUrl" target="_blank">{{ serviceUrl }}</a></strong>
     </div>
-    <v-layout row-md column child-flex-md>
+    <v-layout row wrap>
       <v-flex md4>
         <line-chart class="chart-stats" :options="{ maintainAspectRatio: false }" :chart-data="requestCollection"></line-chart>
       </v-flex>
