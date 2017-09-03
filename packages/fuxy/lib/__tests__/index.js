@@ -67,7 +67,7 @@ describe('fuxy', () => {
     expect(res.json.mock.calls[0]).toEqual(['result'])
   })
   it('should call next if error', async () => {
-    loadFunction.mockImplementation(() => { throw new Error('reason') })
+    loadFunction.mockImplementationOnce(() => { throw new Error('reason') })
     await fuxyMiddleware(req, res, next)
     expect(next.mock.calls.length).toBe(1)
     expect(next.mock.calls[0][0]).toMatchObject({ message: 'reason' })
