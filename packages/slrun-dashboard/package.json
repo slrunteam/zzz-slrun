@@ -1,6 +1,6 @@
 {
   "name": "slrun-dashboard",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "main": "server/index.js",
   "jest": {
     "testEnvironment": "node",
@@ -20,6 +20,11 @@
     "prepack": "npm run build",
     "start": "cross-env NODE_ENV=production PORT=4000 node server/start.js"
   },
+  "files": [
+    "server",
+    ".nuxt",
+    "nuxt.config.js"
+  ],
   "repository": "https://github.com/slrunteam/slrun/tree/master/packages/slrun-dashboard",
   "author": "SL.RUN <team@sl.run>",
   "license": "MIT",
