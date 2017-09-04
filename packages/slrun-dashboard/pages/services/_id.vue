@@ -158,82 +158,87 @@ export default {
   },
   asyncData ({ params, error }) {
     return apiClient.get('/services/' + params.id)
-      .then((res) => {
-        const stats = getInitialStatsState()
-        stats.serviceId = res.data.id
-        stats.serviceUrl = res.data.url
-        const requests = res.data.requests
-        const statsRequest = requests.reduce((re = {}, request) => {
-          if (moment(request.createdAt).isBefore(moment(requests[requests.length - 1].createdAt).subtract(1, 'hours'))) {
-            return re
-          }
-          const time = moment(request.createdAt).format('HH:mm:ss')
-          if (time in re) {
-            if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
-              re[time]['ErrorRequests']++
-            } else {
-              re[time]['Requests']++
-            }
-            re[time]['ResponseTime'] += request.resTime
-            re[time]['Responses']++
-            re[time]['DataTransferred'] += request.resSize
-          } else {
-            re[time] = {}
-            if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
-              re[time]['ErrorRequests'] = 1
-              re[time]['Requests'] = 0
-            } else {
-              re[time]['ErrorRequests'] = 0
-              re[time]['Requests'] = 1
-            }
-            re[time]['ResponseTime'] = request.resTime
-            re[time]['Responses'] = 1
-            re[time]['DataTransferred'] = request.resSize
-          }
-          return re
-        }, {})
-        Object.keys(statsRequest).forEach(function (key) {
-          stats.requestCollection.labels.push(key)
-          stats.requestCollection.datasets[0].data.push(statsRequest[key]['Requests'])
-          stats.requestCollection.datasets[1].data.push(statsRequest[key]['ErrorRequests'])
-          stats.responseCollection.labels.push(key)
-          stats.responseCollection.datasets[0].data.push((statsRequest[key]['ResponseTime'] / statsRequest[key]['Responses']).toFixed(3))
-          stats.dataTransferredCollection.labels.push(key)
-          stats.dataTransferredCollection.datasets[0].data.push(statsRequest[key]['DataTransferred'] / 1000)
-        })
-        const { serviceId, serviceUrl, requestCollection, responseCollection, dataTransferredCollection } = stats
-        const expanded = {}
-        requests.forEach((request) => {
-          expanded[request.id] = false
-        })
-        return {
-          serviceId,
-          serviceUrl,
-          requestCollection,
-          responseCollection,
-          dataTransferredCollection,
-          search: '',
-          expanded,
-          pagination: { rowsPerPage: 25, sortBy: 'createdAt', descending: true },
-          headers: [
-            { text: 'Url', align: 'left', value: 'reqUrl', sortable: true },
-            { text: 'Method', align: 'left', value: 'reqMethod', sortable: true },
-            { text: 'Status', align: 'left', value: 'resStatusCode', sortable: true },
-            { text: 'Size', align: 'right', value: 'resSize', sortable: true },
-            { text: 'Time', align: 'right', value: 'resTime', sortable: true },
-            { text: 'Created At', align: 'right', value: 'createdAt', sortable: true }
-          ],
-          items: requests
-        }
-      })
-      .catch((e) => {
-        error({ statusCode: 404, message: 'Service not found' })
-      })
+      .then((res) => getCurrentStats(res))
+      .catch((e) => error({ statusCode: 404, message: 'Service not found' }))
   },
   head () {
     return {
       title: `SL.RUN Dashboard - ${this.serviceId}`
     }
+  }
+}
+
+const getCurrentStats = (res) => {
+  const requests = res.data.requests
+  const statsRequest = requests.reduce((re = {}, request) => {
+    if (moment(request.createdAt).isBefore(moment(requests[requests.length - 1].createdAt).subtract(1, 'hours'))) {
+      return re
+    }
+    const time = moment(request.createdAt).format('HH:mm:ss')
+    if (time in re) {
+      if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
+        re[time]['ErrorRequests']++
+      } else {
+        re[time]['Requests']++
+      }
+      re[time]['ResponseTime'] += request.resTime
+      re[time]['Responses']++
+      re[time]['DataTransferred'] += request.resSize
+    } else {
+      re[time] = {}
+      if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
+        re[time]['ErrorRequests'] = 1
+        re[time]['Requests'] = 0
+      } else {
+        re[time]['ErrorRequests'] = 0
+        re[time]['Requests'] = 1
+      }
+      re[time]['ResponseTime'] = request.resTime
+      re[time]['Responses'] = 1
+      re[time]['DataTransferred'] = request.resSize
+    }
+    return re
+  }, {})
+  return parseStats(res, statsRequest)
+}
+
+const parseStats = (res, statsRequest) => {
+  const requests = res.data.requests
+  const stats = getInitialStatsState()
+  stats.serviceId = res.data.id
+  stats.serviceUrl = res.data.url
+  Object.keys(statsRequest).forEach(function (key) {
+    stats.requestCollection.labels.push(key)
+    stats.requestCollection.datasets[0].data.push(statsRequest[key]['Requests'])
+    stats.requestCollection.datasets[1].data.push(statsRequest[key]['ErrorRequests'])
+    stats.responseCollection.labels.push(key)
+    stats.responseCollection.datasets[0].data.push((statsRequest[key]['ResponseTime'] / statsRequest[key]['Responses']).toFixed(3))
+    stats.dataTransferredCollection.labels.push(key)
+    stats.dataTransferredCollection.datasets[0].data.push(statsRequest[key]['DataTransferred'] / 1000)
+  })
+  const { serviceId, serviceUrl, requestCollection, responseCollection, dataTransferredCollection } = stats
+  const expanded = {}
+  requests.forEach((request) => {
+    expanded[request.id] = false
+  })
+  return {
+    serviceId,
+    serviceUrl,
+    requestCollection,
+    responseCollection,
+    dataTransferredCollection,
+    search: '',
+    expanded,
+    pagination: { rowsPerPage: 25, sortBy: 'createdAt', descending: true },
+    headers: [
+      { text: 'Url', align: 'left', value: 'reqUrl', sortable: true },
+      { text: 'Method', align: 'left', value: 'reqMethod', sortable: true },
+      { text: 'Status', align: 'left', value: 'resStatusCode', sortable: true },
+      { text: 'Size', align: 'right', value: 'resSize', sortable: true },
+      { text: 'Time', align: 'right', value: 'resTime', sortable: true },
+      { text: 'Created At', align: 'right', value: 'createdAt', sortable: true }
+    ],
+    items: requests
   }
 }
 </script>
