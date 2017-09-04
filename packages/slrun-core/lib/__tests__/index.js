@@ -23,12 +23,6 @@ describe('createExecutor', () => {
   const socket = 'socket'
   const head = 'head'
   const upgrade = jest.fn()
-  it('should skip if url starts with /__slrun__', () => {
-    const executor = createExecutor(options)
-    executor({ url: '/__slrun__/a' }, res, next)
-    expect(next.mock.calls.length).toBe(1)
-    expect(next.mock.calls[0].length).toBe(0)
-  })
   it('should skip if entry not found', () => {
     const executor = createExecutor(options)
     executor({ url: '/c' }, res, next)

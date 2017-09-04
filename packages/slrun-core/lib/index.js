@@ -9,10 +9,6 @@ function createExecutor (options) {
   const entries = createEntries(options)
   return Object.assign(executor, { upgrade })
   function executor (req, res, next) {
-    if (!req.url.indexOf('/__slrun__')) {
-      next()
-      return
-    }
     const entry = findEntry(entries, req.url)
     if (!entry) {
       next()

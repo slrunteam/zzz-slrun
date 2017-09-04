@@ -14,30 +14,54 @@ const jsonParser = bodyParser.json()
 module.exports = function createClient (options) {
   const { name, executor, apiClient, tunnelAuth, dashboardUrl, decorators = {} } = options
   const client = new EventEmitter2()
+  createDashboardClient(client, dashboardUrl)
+  const app = express()
+  const httpServer = http.createServer(app)
+  setUpAPIs(app, httpServer, client, executor)
+  if (decorators.client) {
+    decorators.client(client)
+  }
+  createSSHTunnel(client, name, apiClient, tunnelAuth, decorators)
+  return client
+}
+
+function createDashboardClient (client, dashboardUrl) {
+  if (!dashboardUrl) {
+    return
+  }
   const PrimusSocket = Primus.createSocket({
     transformer: 'websockets',
     parser: 'msgpack',
     plugin: { substream }
   })
-  const dashboardClient = dashboardUrl ? new PrimusSocket(dashboardUrl) : null
-  if (dashboardClient) {
-    dashboardClient.on('open', () => {
-      console.log('started connection')
-      reportService()
-    })
-    client.on('create-service', reportService)
-    dashboardClient.on('end', () => {
-      console.log('stopped connection')
-    })
-    dashboardClient.on('reconnect', () => {
-      console.log('attempting to reconnect')
-    })
-    dashboardClient.on('error', (err) => {
-      console.error(err)
-    })
+  const dashboardClient = new PrimusSocket(dashboardUrl)
+  Object.assign(client, { dashboardClient })
+  dashboardClient.on('open', () => {
+    console.log('started connection')
+    reportService(client)
+  })
+  client.on('create-service', () => reportService(client))
+  dashboardClient.on('end', () => {
+    console.log('stopped connection')
+  })
+  dashboardClient.on('reconnect', () => {
+    console.log('attempting to reconnect')
+  })
+  dashboardClient.on('error', (err) => {
+    console.error(err)
+  })
+}
+
+function reportService (client) {
+  if (!client.service) {
+    return
   }
-  const app = express()
-  const requests = []
+  const { dashboardClient, service: { id, url, clientKey }, localPort } = client
+  dashboardClient.substream('REPORT_SERVICE').write({ id, url, localPort, clientKey })
+}
+
+function setUpAPIs (app, httpServer, client, executor) {
+  Object.assign(client, { app, httpServer, requests: [] })
   app.get('/__slrun__/requests', (req, res) => {
     if (!client.service || client.service.clientKey !== req.query.clientKey) {
       res.status(403).end()
@@ -51,20 +75,25 @@ module.exports = function createClient (options) {
       return
     }
     jsonParser(req, res, () => {
-      requests.push(req.body)
+      client.requests.push(req.body)
       res.json('OK')
     })
   })
-  app.use(executor)
-  const httpServer = http.createServer(app)
+  app.use((req, res, next) => {
+    if (!req.url.indexOf('/__slrun__')) {
+      next()
+      return
+    }
+    executor(req, res, next)
+  })
   httpServer.on('upgrade', executor.upgrade)
-  Object.assign(client, { app, httpServer, dashboardClient, requests })
-  if (decorators.client) {
-    decorators.client(client)
-  }
+}
+
+function createSSHTunnel (client, name, apiClient, tunnelAuth, decorators) {
+  const { httpServer } = client
   httpServer.listen(0, localhost, async () => {
-    const sshPoint = (await apiClient.sshPoints.get('/random')).data
     const localPort = httpServer.address().port
+    const sshPoint = (await apiClient.sshPoints.get('/random')).data
     const tunnelConfig = Object.assign({
       dstHost: '0.0.0.0',
       dstPort: 0,
@@ -78,8 +107,6 @@ module.exports = function createClient (options) {
         throw err
       }
     })
-    Object.assign(client, { tunnel })
-    client.emit('create-tunnel')
     // BD: Mac OS X uses the keyboard-interactive mechanism to display a password prompt
     // https://github.com/mscdex/ssh2/issues/238
     if (tunnelAuth.password) {
@@ -89,24 +116,23 @@ module.exports = function createClient (options) {
         }
       })
     }
-    tunnel.on('forward-in', async (remotePort) => {
-      const serviceOptions = { name, sshPoint, remotePort }
-      try {
-        const service = (await apiClient.services.post('/register', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
-        Object.assign(client, { service, localPort })
-        client.emit('create-service')
-      } catch (error) {
-        console.log('create-service error')
-        process.exit(1)
-      }
-    })
-    // BD: TODO reconnect when tunnel is closed
+    Object.assign(client, { localPort, tunnel })
+    client.emit('create-tunnel')
+    createService(client, name, apiClient, sshPoint, decorators)
   })
-  return client
-  function reportService () {
-    if (dashboardClient && client.service) {
-      const { service: { id, url, clientKey }, localPort } = client
-      dashboardClient.substream('REPORT_SERVICE').write({ id, url, localPort, clientKey })
+}
+
+function createService (client, name, apiClient, sshPoint, decorators) {
+  const { tunnel } = client
+  tunnel.on('forward-in', async (remotePort) => {
+    const serviceOptions = { name, sshPoint, remotePort }
+    try {
+      const service = (await apiClient.services.post('/register', decorators.serviceOptions ? decorators.serviceOptions(serviceOptions) : serviceOptions)).data
+      Object.assign(client, { service })
+      client.emit('create-service')
+    } catch (err) {
+      console.error(err)
+      process.exit(1)
     }
-  }
+  })
 }
