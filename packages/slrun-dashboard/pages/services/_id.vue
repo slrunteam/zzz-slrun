@@ -51,12 +51,12 @@
             <v-expansion-panel>
               <v-expansion-panel-content v-model="expanded[props.item.id]">
                 <v-container>
-                  <p> <strong>Id:</strong> {{ props.item.id }}</p>
-                  <p> <strong>Url:</strong> {{ props.item.reqUrl }}</p>
-                  <p> <strong>Method:</strong> {{ props.item.reqMethod }}</p>
-                  <p> <strong>Headers:</strong> </p>
+                  <p><strong>Id:</strong> {{ props.item.id }}</p>
+                  <p><strong>Url:</strong> {{ props.item.reqUrl }}</p>
+                  <p><strong>Method:</strong> {{ props.item.reqMethod }}</p>
+                  <p><strong>Headers:</strong> </p>
                   <p v-for="(value, key) in props.item.reqHeaders">
-                    <strong> &nbsp; {{ key }}:</strong> {{ value }}
+                    <strong class="ml-3">{{ key }}:</strong> {{ value }}
                   </p>
                   <v-btn block secondary dark v-on:click.native="replay(props.item)">Replay</v-btn>
                 </v-container>
@@ -145,17 +145,6 @@ export default {
     },
     replay: (request) => {
       const host = request.reqHeaders['host']
-      delete request.reqHeaders['host']
-      delete request.reqHeaders['connection']
-      delete request.reqHeaders['referer']
-      delete request.reqHeaders['accept-encoding']
-      delete request.reqHeaders['user-agent']
-      delete request.reqHeaders['origin']
-      delete request.reqHeaders['upgrade-insecure-requests']
-      delete request.reqHeaders['cookie']
-      delete request.reqHeaders['x-real-ip']
-      delete request.reqHeaders['content-length']
-      delete request.reqHeaders['cache-control']
       const data = request.reqBody ? request.reqBody : null
       const replayOptions = {
         baseURL: `http://${host}/`,
@@ -248,17 +237,18 @@ export default {
   }
 }
 </script>
+
 <style scoped>
-.chart-stats {
-  height: 250px;
-}
-tr.expand td {
-  padding: 0 !important;
-}
-tr.expand .expansion-panel {
-  box-shadow: none;
-}
-tr.expand .expansion-panel li {
-  border: none;
-}
+  .chart-stats {
+    height: 250px;
+  }
+  tr.expand td {
+    padding: 0 !important;
+  }
+  tr.expand .expansion-panel {
+    box-shadow: none;
+  }
+  tr.expand .expansion-panel li {
+    border: none;
+  }
 </style>
