@@ -1,5 +1,6 @@
 require('ws')
 require('primus-msgpack')
+const path = require('path')
 const http = require('http')
 const express = require('express')
 const Primus = require('primus')
@@ -25,10 +26,16 @@ module.exports = function createServer (options = {}) {
     parser: 'msgpack',
     plugin: { substream }
   })
+  primus.save(path.join(__dirname, '../static/socket-client.js'))
   const serviceBySparkId = {}
   primus.on('connection', (spark) => {
     console.log('started connection')
     spark.substream('REPORT_SERVICE').on('data', (service) => { serviceBySparkId[spark.id] = service })
+    spark.substream('REPORT_REQUEST').on('data', ({ serviceId, request }) => {
+      primus.forEach((sparkToBroadcast) => {
+        sparkToBroadcast.substream(`REQUEST@${serviceId}`).write(request)
+      })
+    })
   })
   primus.on('disconnection', (spark) => {
     console.log('stopped connection')

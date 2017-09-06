@@ -79,6 +79,11 @@ import moment from 'moment'
 
 const size = filesize.partial({ base: 10, round: 1 })
 
+if (!process.server) {
+  const primus = new Primus('http://localhost:4000')
+  primus.substream('REQUEST@test').on('data', console.log)
+}
+
 const getInitialStatsState = () => ({
   serviceId: '',
   requestCollection: {
@@ -163,7 +168,10 @@ export default {
   },
   head () {
     return {
-      title: `SL.RUN Dashboard - ${this.serviceId}`
+      title: `SL.RUN Dashboard - ${this.serviceId}`,
+      script: [
+        { src: '/socket-client.js' }
+      ]
     }
   }
 }

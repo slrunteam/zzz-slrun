@@ -60,6 +60,14 @@ function reportService (client) {
   dashboardClient.substream('REPORT_SERVICE').write({ id, url, localPort, clientKey })
 }
 
+function reportRequest (client, request) {
+  if (!client.service) {
+    return
+  }
+  const { dashboardClient, service } = client
+  dashboardClient.substream('REPORT_REQUEST').write({ serviceId: service.id, request })
+}
+
 function setUpAPIs (app, httpServer, client, executor) {
   Object.assign(client, { app, httpServer, requests: [] })
   app.get('/__slrun__/requests', (req, res) => {
@@ -75,7 +83,9 @@ function setUpAPIs (app, httpServer, client, executor) {
       return
     }
     jsonParser(req, res, () => {
-      client.requests.push(req.body)
+      const request = req.body
+      reportRequest(client, request)
+      client.requests.push(request)
       res.json('OK')
     })
   })
