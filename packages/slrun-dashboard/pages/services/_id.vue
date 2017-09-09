@@ -38,7 +38,7 @@
         </span>
       </template>
       <template slot="items" scope="props">
-        <tr style="cursor:pointer" @click="expanded[props.item.id] = !expanded[props.item.id]">
+        <tr style="cursor:pointer" @click="props.item.expanded = !props.item.expanded">
           <td>{{ props.item.reqUrl }}</td>
           <td>{{ props.item.reqMethod }}</td>
           <td>{{ props.item.resStatusCode }}</td>
@@ -46,10 +46,10 @@
           <td class="text-xs-right">{{ formatedTime(props.item.resTime) }}</td>
           <td class="text-xs-right">{{ formatedCreatedAt(props.item.createdAt) }}</td>
         </tr>
-        <tr class="expand" v-show="expanded[props.item.id]">
+        <tr class="expand" v-show="props.item.expanded">
           <td colspan="100%">
             <v-expansion-panel>
-              <v-expansion-panel-content v-model="expanded[props.item.id]">
+              <v-expansion-panel-content v-model="props.item.expanded">
                 <v-container>
                   <p><strong>Id:</strong> {{ props.item.id }}</p>
                   <p><strong>Url:</strong> {{ props.item.reqUrl }}</p>
@@ -79,13 +79,9 @@ import moment from 'moment'
 
 const size = filesize.partial({ base: 10, round: 1 })
 
-if (!process.server) {
-  const primus = new Primus('http://localhost:4000')
-  primus.substream('REQUEST@test').on('data', console.log)
-}
-
 const getInitialStatsState = () => ({
   serviceId: '',
+  statsRequest: {},
   requestCollection: {
     labels: [],
     datasets: [
@@ -166,14 +162,63 @@ export default {
       .then((res) => getCurrentStats(res))
       .catch((e) => error({ statusCode: 404, message: 'Service not found' }))
   },
+  mounted () {
+    const primus = new Primus()
+    primus.substream(`REQUEST@${this.serviceId}`).on('data', (request) => {
+      const stats = createNewStats(request, this)
+      this.statsRequest = Object.assign({}, stats.statsRequest)
+      this.requestCollection = Object.assign({}, stats.requestCollection)
+      this.responseCollection = Object.assign({}, stats.responseCollection)
+      this.dataTransferredCollection = Object.assign({}, stats.dataTransferredCollection)
+      request.expanded = false
+      this.items.push(request)
+    })
+  },
   head () {
     return {
-      title: `SL.RUN Dashboard - ${this.serviceId}`,
-      script: [
-        { src: '/socket-client.js' }
-      ]
+      title: `SL.RUN Dashboard - ${this.serviceId}`
     }
   }
+}
+
+const createNewStats = (request, data) => {
+  const { statsRequest, requestCollection, responseCollection, dataTransferredCollection } = data
+  const time = moment(request.createdAt).format('HH:mm:ss')
+  if (time in statsRequest) {
+    if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
+      statsRequest[time]['ErrorRequests']++
+    } else {
+      statsRequest[time]['Requests']++
+    }
+    statsRequest[time]['ResponseTime'] += request.resTime
+    statsRequest[time]['Responses']++
+    statsRequest[time]['DataTransferred'] += request.resSize
+    const index = requestCollection.labels.indexOf(time)
+    requestCollection.datasets[0].data[index] = statsRequest[time]['Requests']
+    requestCollection.datasets[1].data[index] = statsRequest[time]['ErrorRequests']
+    responseCollection.datasets[0].data[index] = (statsRequest[time]['ResponseTime'] / statsRequest[time]['Responses']).toFixed(3)
+    dataTransferredCollection.datasets[0].data[index] = statsRequest[time]['DataTransferred'] / 1000
+  } else {
+    statsRequest[time] = {}
+    if (request.resStatusCode >= 400 && request.resStatusCode < 600) {
+      statsRequest[time]['ErrorRequests'] = 1
+      statsRequest[time]['Requests'] = 0
+    } else {
+      statsRequest[time]['ErrorRequests'] = 0
+      statsRequest[time]['Requests'] = 1
+    }
+    statsRequest[time]['ResponseTime'] = request.resTime
+    statsRequest[time]['Responses'] = 1
+    statsRequest[time]['DataTransferred'] = request.resSize
+    requestCollection.labels.push(time)
+    responseCollection.labels.push(time)
+    dataTransferredCollection.labels.push(time)
+    requestCollection.datasets[0].data.push(statsRequest[time]['Requests'])
+    requestCollection.datasets[1].data.push(statsRequest[time]['ErrorRequests'])
+    responseCollection.datasets[0].data.push((statsRequest[time]['ResponseTime'] / statsRequest[time]['Responses']).toFixed(3))
+    dataTransferredCollection.datasets[0].data.push(statsRequest[time]['DataTransferred'] / 1000)
+  }
+  return { statsRequest, requestCollection, responseCollection, dataTransferredCollection }
 }
 
 const getCurrentStats = (res) => {
@@ -225,18 +270,17 @@ const parseStats = (res, statsRequest) => {
     stats.dataTransferredCollection.datasets[0].data.push(statsRequest[key]['DataTransferred'] / 1000)
   })
   const { serviceId, serviceUrl, requestCollection, responseCollection, dataTransferredCollection } = stats
-  const expanded = {}
   requests.forEach((request) => {
-    expanded[request.id] = false
+    request.expanded = false
   })
   return {
     serviceId,
+    statsRequest,
     serviceUrl,
     requestCollection,
     responseCollection,
     dataTransferredCollection,
     search: '',
-    expanded,
     pagination: { rowsPerPage: 25, sortBy: 'createdAt', descending: true },
     headers: [
       { text: 'Url', align: 'left', value: 'reqUrl', sortable: true },
