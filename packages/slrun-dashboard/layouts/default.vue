@@ -34,7 +34,7 @@ export default {
   data: () => ({
     drawer: false,
     items: [
-      { icon: 'home', text: 'Home', to: "/" },
+      { icon: 'home', text: 'Home', to: '/' },
     ]
   })
 }

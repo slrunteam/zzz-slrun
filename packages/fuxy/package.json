@@ -1,13 +1,27 @@
 {
   "name": "fuxy",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "main": "lib/index.js",
   "jest": {
     "testEnvironment": "node",
     "clearMocks": true,
     "testPathIgnorePatterns": [
       "/example/"
-    ]
+    ],
+    "collectCoverageFrom": [
+      "lib/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/example/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+      }
+    }
   },
   "standard": {
     "env": {
@@ -19,14 +33,14 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest --coverage",
     "start": "node example/server"
   },
   "repository": "https://github.com/slrunteam/slrun/tree/master/packages/fuxy",
   "author": "SL.RUN <team@sl.run>",
   "license": "MIT",
   "dependencies": {
-    "mime-types": "^2.1.16"
+    "lodash.isfunction": "^3.0.8"
   }
 }

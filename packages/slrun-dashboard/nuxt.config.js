@@ -4,10 +4,15 @@ module.exports = {
   head: {
     link: [
       { rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' }
+    ],
+    script: [
+      { src: '/socket-client.js' }
     ]
   },
   build: {
-    vendor: ['axios', 'chart.js', 'filesize', 'moment', 'vue-chartjs', 'vuetify', '~/plugins/apiClient'],
+    vendor: ['axios', 'filesize', 'moment', 'vuetify'],
+    // BD: dll does not work, try again later
+    dll: false,
     extractCSS: true,
     extend (config) {
       const packageContainerPath = path.join(__dirname, '../../node_modules')

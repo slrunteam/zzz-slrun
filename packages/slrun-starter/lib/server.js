@@ -13,7 +13,7 @@ function startServer () {
   app.use(serviceHandler)
   app.use(bodyParser.json())
   app.get('/api/ssh-points/random', (req, res) => res.json(api.sshPoints.getRandom()))
-  app.post('/api/services', (req, res) => res.json(api.services.create(req.body)))
+  app.post('/api/services/register', (req, res) => res.json(api.services.register(req.body)))
   const httpServer = http.createServer(app)
   httpServer.on('upgrade', upgradeHandler)
   httpServer.listen(3000)

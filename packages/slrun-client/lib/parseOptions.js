@@ -18,29 +18,33 @@ module.exports = function parseOptions (processArgv) {
 
 function parseEntries (argv) {
   return Object.keys(argv)
-    .map((key) => {
-      const values = isArray(argv[key]) ? argv[key] : [argv[key]]
-      if (key === 'proxy') {
-        return values.map((value) => createUrlEntry(value, 'PROXY'))
+    .map((key) => createEntry(key, argv))
+    .reduce(flattenEntries, [])
+}
+
+function createEntry (key, argv) {
+  const values = isArray(argv[key]) ? argv[key] : [argv[key]]
+  if (key === 'proxy') {
+    return values.map((value) => createUrlEntry(value, 'PROXY'))
+  }
+  if (key === 'static') {
+    return values.map((value) => createPathEntry(value, 'STATIC'))
+  }
+  if (key === 'function') {
+    return values.map((value) => createPathEntry(value, 'FUNCTION'))
+  }
+  return null
+}
+
+function flattenEntries (entries, subEntries) {
+  if (subEntries) {
+    subEntries.forEach((subEntry) => {
+      if (subEntry) {
+        entries.push(subEntry)
       }
-      if (key === 'static') {
-        return values.map((value) => createPathEntry(value, 'STATIC'))
-      }
-      if (key === 'function') {
-        return values.map((value) => createPathEntry(value, 'FUNCTION'))
-      }
-      return null
     })
-    .reduce((entries, subEntries) => {
-      if (subEntries) {
-        subEntries.forEach((subEntry) => {
-          if (subEntry) {
-            entries.push(subEntry)
-          }
-        })
-      }
-      return entries
-    }, [])
+  }
+  return entries
 }
 
 function createUrlEntry (value, mode) {

@@ -11,46 +11,61 @@ module.exports = async function build (config) {
   const packageNames = find(packageDir)
   const licensePath = path.resolve('LICENSE')
   const rootPackageInfo = await fs.readJson(path.resolve('package.json'))
-  const packageVersions = {}
+  const packageVersions = await getPackageVersions(packageDir, packageNames)
   const allDeps = {}
   for (const packageName of packageNames) {
     const packagePath = path.resolve(packageDir, packageName)
-    const packageInfo = await fs.readJson(path.join(packagePath, 'package.json'))
-    packageVersions[packageName] = packageInfo.version
-  }
-  for (const packageName of packageNames) {
-    const packagePath = path.resolve(packageDir, packageName)
-    // copy LICENSE
-    await fs.copy(licensePath, path.join(packagePath, 'LICENSE'))
-    // find dependencies
-    const deps = {}
-    updateDeps(deps, packagePath, ignoreSrc[packageName], true)
-    Object.keys(deps).forEach((dep) => { allDeps[dep] = true })
-    const notFoundDeps = Object.keys(deps)
-      .filter((dep) => !rootPackageInfo.dependencies[dep] && !rootPackageInfo.devDependencies[dep] &&
-        !packageVersions[dep])
-    if (notFoundDeps.length) {
-      console.warn(chalk.red(`Not found deps for [${packageName}]: ${notFoundDeps.join(', ')}`))
-    }
-    const sortedDeps = Object.keys(deps).filter((dep) => rootPackageInfo.dependencies[dep] || packageVersions[dep])
-    sortedDeps.sort()
-    // modify package.json to add repository, author, license and dependencies
-    const packageInfo = await fs.readJson(path.join(packagePath, 'package.json'))
-    Object.assign(packageInfo, {
-      repository: `${rootPackageInfo.repository}/tree/master/${packageDir}/${packageName}`,
-      author: rootPackageInfo.author,
-      license: rootPackageInfo.license,
-      dependencies: sortedDeps.reduce((depVersions, dep) => {
-        depVersions[dep] = rootPackageInfo.dependencies[dep] || `^${packageVersions[dep]}`
-        return depVersions
-      }, {})
-    })
-    await fs.writeJson(path.join(packagePath, 'package.json'), packageInfo, { spaces: 2 })
+    await copyLicense(licensePath, packagePath)
+    const deps = await findDeps(packageName, packagePath, ignoreSrc, allDeps, rootPackageInfo, packageVersions)
+    await modifyPackageInfo(packagePath, packageDir, packageName, deps, rootPackageInfo, packageVersions)
   }
   const unusedDeps = Object.keys(rootPackageInfo.dependencies).filter((dep) => !allDeps[dep])
   if (unusedDeps.length) {
     console.warn(chalk.red(`Unused deps: ${unusedDeps.join(', ')}`))
   }
+}
+
+async function modifyPackageInfo (packagePath, packageDir, packageName, deps, rootPackageInfo, packageVersions) {
+  const packageInfo = await fs.readJson(path.join(packagePath, 'package.json'))
+  Object.assign(packageInfo, {
+    repository: `${rootPackageInfo.repository}/tree/master/${packageDir}/${packageName}`,
+    author: rootPackageInfo.author,
+    license: rootPackageInfo.license,
+    dependencies: deps.reduce((depVersions, dep) => {
+      depVersions[dep] = rootPackageInfo.dependencies[dep] || `^${packageVersions[dep]}`
+      return depVersions
+    }, {})
+  })
+  await fs.writeJson(path.join(packagePath, 'package.json'), packageInfo, { spaces: 2 })
+}
+
+async function getPackageVersions (packageDir, packageNames) {
+  const packageVersions = {}
+  for (const packageName of packageNames) {
+    const packagePath = path.resolve(packageDir, packageName)
+    const packageInfo = await fs.readJson(path.join(packagePath, 'package.json'))
+    packageVersions[packageName] = packageInfo.version
+  }
+  return packageVersions
+}
+
+async function copyLicense (licensePath, packagePath) {
+  await fs.copy(licensePath, path.join(packagePath, 'LICENSE'))
+}
+
+async function findDeps (packageName, packagePath, ignoreSrc, allDeps, rootPackageInfo, packageVersions) {
+  const deps = {}
+  updateDeps(deps, packagePath, ignoreSrc[packageName], true)
+  Object.keys(deps).forEach((dep) => { allDeps[dep] = true })
+  const notFoundDeps = Object.keys(deps)
+    .filter((dep) => !rootPackageInfo.dependencies[dep] && !rootPackageInfo.devDependencies[dep] &&
+      !packageVersions[dep])
+  if (notFoundDeps.length) {
+    console.warn(chalk.red(`Not found deps for [${packageName}]: ${notFoundDeps.join(', ')}`))
+  }
+  const sortedDeps = Object.keys(deps).filter((dep) => rootPackageInfo.dependencies[dep] || packageVersions[dep])
+  sortedDeps.sort()
+  return sortedDeps
 }
 
 function updateDeps (deps, srcPath, namesToIgnore, isRoot) {

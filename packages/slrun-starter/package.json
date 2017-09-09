@@ -13,8 +13,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "npm run lint && jest --testPathPattern=__tests__",
-    "test:strict": "standard && jest --testPathPattern=__tests__",
+    "test": "npm run lint && jest",
+    "test:strict": "standard && jest",
     "proxy": "cd ../slrun-core/example/proxy && npm start",
     "dashboard": "cd ../slrun-dashboard && npm run dev",
     "server": "node lib/server",
@@ -27,8 +27,9 @@
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
-    "slrun-client": "^0.1.9",
-    "slrun-core": "^0.1.4",
-    "slrun-server": "^0.1.2"
+    "slrun-client": "^0.1.11",
+    "slrun-core": "^0.1.5",
+    "slrun-server": "^0.1.2",
+    "uuid": "^3.1.0"
   }
 }

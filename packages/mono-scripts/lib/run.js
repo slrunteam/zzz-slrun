@@ -10,10 +10,8 @@ module.exports = async function run (config, argv) {
   const args = argv.slice(1)
   const packageNames = find(config.packageDir)
   for (const packageName of packageNames) {
-    const exitCode = await spawn(command, args, {
-      cwd: path.resolve(packageDir, packageName),
-      stdio: ['pipe', process.stdout, process.stderr],
-      env: process.env
+    const exitCode = await spawn.run(command, args, {
+      cwd: path.resolve(packageDir, packageName)
     })
     if (exitCode) {
       return exitCode

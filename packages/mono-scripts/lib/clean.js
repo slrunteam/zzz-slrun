@@ -8,9 +8,7 @@ module.exports = async function clean (config) {
   const packageNames = find(packageDir)
   for (const packageName of packageNames) {
     const packagePath = path.resolve(packageDir, packageName)
-    // remove LICENSE
     await fs.remove(path.join(packagePath, 'LICENSE'))
-    // modify package.json to remove repository, author, license and dependencies
     const packageInfo = await fs.readJson(path.join(packagePath, 'package.json'))
     delete packageInfo.repository
     delete packageInfo.author
