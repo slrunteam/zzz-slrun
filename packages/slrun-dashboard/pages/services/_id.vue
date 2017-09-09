@@ -55,7 +55,7 @@
                   <p><strong>Url:</strong> {{ props.item.reqUrl }}</p>
                   <p><strong>Method:</strong> {{ props.item.reqMethod }}</p>
                   <p><strong>Headers:</strong> </p>
-                  <p v-for="(value, key) in props.item.reqHeaders">
+                  <p v-for="(value, key) in props.item.reqHeaders" :key="key">
                     <strong class="ml-3">{{ key }}:</strong> {{ value }}
                   </p>
                   <v-btn block secondary dark v-on:click.native="replay(props.item)">Replay</v-btn>
